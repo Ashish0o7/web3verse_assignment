@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Word to PDF Converter</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Word to PDF Converter</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="fileInput">Select a Word document (.docx):</label>
+                <input type="file" class="form-control-file" id="fileInput" accept=".docx">
+            </div>
+            <button type="submit" class="btn btn-primary">Convert to PDF</button>
+        </form>
+        <div id="message" class="mt-3"></div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var fileInput = document.getElementById('fileInput');
+            var file = fileInput.files[0];
+
+            if (!file || file.type !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                displayMessage('Please select a valid Word document (.docx).', 'danger');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                displayMessage('File size exceeds the maximum limit of 5 MB.', 'danger');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('file', file);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'https://3wo2dizb01.execute-api.ap-south-1.amazonaws.com/1');
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    displayMessage('File uploaded and converted successfully!', 'success');
+                } else {
+                    displayMessage('Failed to upload/convert the file.', 'danger');
+                }
+            };
+            xhr.send(formData);
+        });
+
+        function displayMessage(message, type) {
+            var messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '<div class="alert alert-' + type + '">' + message + '</div>';
+        }
+    </script>
+</body>
+</html>
